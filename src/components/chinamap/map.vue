@@ -1,8 +1,8 @@
 <template>
   <div id="china_map_box">
-  <div class="title">
+  <h3 class="title">
     中国疫情
-  </div>
+  </h3>
   <div class="xoaptitle">
     <div class="first">
       中国疫情图
@@ -161,7 +161,6 @@ export default {
   watch: {
     dataList:{
       handler: function(nVal, oVal){
-        this.bian = true
         this.setEchartOption(nVal)
         this.$nextTick(() => {
         this.initEchartMap();
@@ -169,7 +168,6 @@ export default {
         }
       },
       deep: true
-    
   },
   mounted() {
     setTimeout(() => {
@@ -203,13 +201,14 @@ export default {
 .title {
   position: relative;
   font-size: 35px !important;
-  padding: 15px 0  15px 15px;
+  font-weight: 400 !important;
+  padding: 25px 0  25px 15px;
 }
 .title::after {
   content: '';
   position: absolute;
   left: 0;
-  top: 25px;
+  top: 35px;
   width: 8px;
   height: 30px;
   background-color: rgb(225, 0, 0);

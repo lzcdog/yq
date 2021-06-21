@@ -1,6 +1,13 @@
 <template>
   <div id="china_map_box1">
+    <div class="title">
+      <h2>全国疫情新增趋势</h2>
+      <p>数据说明</p>
+    </div>
     <div id="box">
+      <div class="p">
+        <p>点击图例可切换展示</p>
+      </div>
       <div id="china_mapp"></div>
     </div>
   </div>
@@ -11,7 +18,9 @@ const e = document.documentElement.clientWidth;
 import * as echarts from "echarts";
 export default {
   props: {
-    datelist: Array
+    datelist: Array,
+    diertiaodata: Object,
+    diyitiaodata: Object,
   },
   data() {
     return {
@@ -25,20 +34,24 @@ export default {
           trigger: "axis",
         },
         legend: {
-          icon: "rect",
+          itemWidth: 40 * (e / 750),
+          itemHeight: 20 * (e / 750),
+          icon: "roundRect",
+          left: "left",
           data: [],
+          top: "5%",
+          textStyle: {
+            color: "rgb(102, 102, 102)",
+            fontSize: 28 * (e / 750),
+          },
         },
         grid: {
           left: "0%",
           right: "4%",
-          bottom: "30%",
+          top: "20%",
           containLabel: true,
         },
-        // toolbox: {
-        //     feature: {
-        //         saveAsImage: {}
-        //     }
-        // },
+        toolbox: {},
         xAxis: [
           {
             axisTick: {
@@ -46,20 +59,20 @@ export default {
               show: false,
             },
             // max : 60,
-			      // min : 0,
-			      splitNumber : 3,
-			      // boundaryGap : [ 0.2, 0.2 ],
+            // min : 0,
+            // splitNumber : 3,
             axisLabel: {
-              // show: true,
-              // interval: 3,
-              rotate:40,
+              show: true,
+              interval: 2,
+              rotate: 40,
               textStyle: {
                 color: "#000", //更改坐标轴文字颜色
-                fontSize: 10/75 * (e/10), //更改坐标轴文字大小
+                fontSize: (10 / 75) * (e / 10), //更改坐标轴文字大小
               },
             },
             type: "category",
             data: [],
+            // showAllSymbol: true,
           },
         ],
         yAxis: [
@@ -77,42 +90,26 @@ export default {
               show: true,
               textStyle: {
                 color: "#000", //更改坐标轴文字颜色
-                fontSize: 20/75 * (e/10), //更改坐标轴文字大小
+                fontSize: (20 / 75) * (e / 10), //更改坐标轴文字大小
               },
             },
           },
         ],
         series: [
           {
-            name: "邮件营销",
+            name: "确诊",
             type: "line",
-            stack: "总量",
-            data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+            stack: "0",
+            data: [],
+            color: "rgb(163, 29, 19)",
+            hover: "blue",
           },
           {
-            name: "联盟广告",
+            name: "疑似",
             type: "line",
-            stack: "总量",
-            data: [220, 182, 191, 234, 290, 330, 310],
-          },
-          {
-            name: "视频广告",
-            type: "line",
-            stack: "总量",
-            color: "pink",
-            data: [150, 232, 201, 154, 190, 330, 410],
-          },
-          {
-            name: "直接访问",
-            type: "line",
-            stack: "总量",
-            data: [320, 332, 301, 334, 390, 330, 320],
-          },
-          {
-            name: "搜索引擎",
-            type: "line",
-            stack: "总量",
-            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            stack: "1",
+            data: [],
+            color: "rgb(255, 214, 103)",
           },
         ],
       },
@@ -125,13 +122,24 @@ export default {
       let mapDiv1 = document.getElementById("box");
       this.myChart = echarts.init(mapDiv);
       this.myChart.setOption(this.option);
-      mapDiv.style.height = (800 / 75) * (e / 10) + 10 + "px";
-      mapDiv1.style.height = (600 / 75) * (e / 10) + 10 + "px";
+      mapDiv.style.height = (750 / 75) * (e / 10) + 10 + "px";
+      mapDiv1.style.height = (750 / 75) * (e / 10) + 10 + "px";
     },
     //修改echart配制
     setEchartOption() {
-      console.log(this.option)
+      console.log(this.option);
+      //加载时间确诊疑似数据
       this.option.xAxis[0]["data"] = this.datelist;
+      //lengend
+      this.option.legend["data"] = [this.diertiaodata.name,this.diyitiaodata.name];
+      //两个新增数据加载
+      this.option.series[0]["name"] = this.diertiaodata.name;
+      this.option.series[0]["color"] = this.diertiaodata.color;
+      this.option.series[0]["data"] = this.diertiaodata.data;
+
+      this.option.series[1]["name"] = this.diyitiaodata.name;
+      this.option.series[1]["color"] = this.diyitiaodata.color;
+      this.option.series[1]["data"] = this.diyitiaodata.data;
     },
     resize() {
       this.myChart.resize();
@@ -142,8 +150,8 @@ export default {
     setTimeout(() => {
       this.setEchartOption(this.datelist);
       this.$nextTick(() => {
-      this.initEchartMap();
-    });
+        this.initEchartMap();
+      });
     }, 1000);
     let that = this;
     setTimeout(function () {
@@ -152,22 +160,58 @@ export default {
       };
     }, 200);
   },
+  watch: {
+    diertiaodata: {
+      handler: function (nVal, oVal) {
+        this.setEchartOption(nVal);
+        this.$nextTick(() => {
+          this.initEchartMap();
+        });
+      },
+    },
+    diyitiaodata: {
+      handler: function (nVal, oVal) {
+        this.setEchartOption(nVal);
+        this.$nextTick(() => {
+          this.initEchartMap();
+        });
+      },
+    },
+    deep: true,
+  },
 };
 </script>
  
 <style scoped>
+.title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 25px 0;
+}
+.title h2 {
+  font-weight: 400;
+  font-size: 35px;
+}
+.title p {
+  font-size: 16px;
+  color: rgb(177, 177, 177);
+}
+.p {
+  position: absolute;
+  font-size: 16px;
+  top: 78px;
+  right: 20px;
+  color: rgb(177, 177, 177);
+}
 #box {
+  position: relative;
   width: 100%;
-  margin-top: 20px;
   border: 1px solid rgb(221, 221, 221);
 }
 #china_mapp {
-  padding: 40px 20px;
+  padding: 30px 20px 0;
   width: 100%;
-  height: 800px;
-}
-* {
-  padding: 0;
-  margin: 0;
+  height: 750px;
 }
 </style>

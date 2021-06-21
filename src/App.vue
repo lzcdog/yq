@@ -29,6 +29,6 @@ export default {
   max-width: 750px;
   width: 750px;
   margin: 0 auto;
-  height: 5500px;
+  height: 8500px;
 }
 </style>
